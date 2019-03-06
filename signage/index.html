@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--Minimivaatimukset (arvosana 1-2)
+
+toimiva signage-sovellus
+käyttäjätestaus
+
+Tekniset vaatimukset:
+
+ruudun koko 1920 x 1080 pikseliä
+toiminta WLANin kautta
+sisältö joko selaimen kautta tai Binary Emotions -sovelluksen kautta
+ruudun päivitys rakennettuna yhden URLin taakse
+
+Sisältövaatimukset:
+Metropolia-logo
+ennalta annettu tiedote
+toimipaikan ruokalista
+toimipaikan HSL-informaatio
+jokin ryhmän valitsema API näiden lisäksi
+
+Lisäominaisuudet (arvosana 3-5)
+
+minimivaatimukset
+visuaalisuus ja toiminnallisuus hiottu
+responsiivinen, mukautuva sisältö
+sisällönhallinta; sisältölinkkien lisääminen, poistaminen ja muokkaaminen hallintasovelluksella
+tiedotteiden hallinta; tiedotteiden lisääminen, poistaminen ja muokkaaminen hallintasovelluksella
+toimipaikan valinta
+sisällön jaottelu eri alueisiin (samalla ruudulla useita sisältöjä)
+aulatilan 2x2-videoseinän käyttö usealla Raspberry Pi:llä
+omat ideat-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<video autoplay loop muted id="bgvideo">
+    <source src="https://www.metropolia.fi/fileadmin/template/2017/assets/intro/time-lapse.mp4" type="video/mp4">
+</video>
+<div class="block"><div id="logo"></div></div>
+
+<div class="grid_container">
+    <div class="box" id="tiedote"></div>
+    <div class="box" id="ruoka"></div>
+    <div class="box" id="hsl"></div>
+    <div class="box" id="saa"></div>
+</div>
+
+<script src="sign_app.js"></script>
+</body>
+</html>

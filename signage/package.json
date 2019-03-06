@@ -1,0 +1,11 @@
+{
+  "name": "signage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sign_app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC"
+}
