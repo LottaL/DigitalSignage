@@ -1,6 +1,8 @@
 html, body {
     margin: 0;
     padding: 0;
+    font-family: Verdana, Geneva, sans-serif;
+    color: #5f5f5f;
 }
 
 * {
@@ -37,6 +39,15 @@ html, body {
     margin-left: 3vh;
 }
 
+#clock {
+    display: block;
+    position: absolute;
+    top: 7vh;
+    right: 4vh;
+    font-size: 4vh;
+    font-weight: bold;
+}
+
 .grid_container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -53,4 +64,62 @@ html, body {
     height: 40vh;
     border: solid #666f6f 4px;
     z-index: 4;
+}
+
+#saa {
+    background-color: white;
+    opacity: 0.7;
+
+}
+
+.datadiv {
+    height: 20%;
+    display: flex;
+    flex-direction: row;
+}
+
+.datadiv + .datadiv {
+    padding-left: 3vh;
+    padding-top: 1vh;
+}
+
+.datadiv h3 {
+    font-size: 2vh;
+    margin-left: 2vh;
+}
+
+.datadiv h2 {
+    font-size: 2.5vh;
+    margin-left: 1vh;
+    margin-top: 4vh;
+}
+
+.datadiv h1 {
+    font-size: 3.5vh;
+    margin-left: 3vh;
+}
+
+.weatherheader {
+    background-color: rgba(0, 153, 230, 0.5);
+}
+
+.compass {
+    transform-origin: 50% 61%;
+    background-image: url(img/wind.png);
+    position: relative;
+}
+
+#windspeed {
+    margin: auto;
+    padding-top: 1.5vh;
+    padding-left: 1.5vh;
+    font-size: 1.5vh;
+    position: relative;
+}
+
+.icon {
+    display: block;
+    height: 4vh;
+    width: 4vh;
+    background-size: 100% 100%;
 }
