@@ -1,0 +1,12 @@
+{
+    stopsByRadius(lat:60.258,lon:24.843,radius:500) {
+        edges {
+            node {
+                stop {
+                    gtfsId
+                    name
+                }
+            }
+        }
+    }
+}

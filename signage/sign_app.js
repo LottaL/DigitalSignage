@@ -4,18 +4,25 @@ const body = document.querySelector('body'),
     tiedote = document.querySelector('#tiedote'),
     ruoka = document.querySelector('#ruoka'),
     hsl = document.querySelector('#hsl'),
-    saa = document.querySelector('#saa');
+    saa = document.querySelector('#saa'),
+    timetable = document.querySelector('#timetable');
+let campus = 'leiritiestop',
+    Arabia = 16364,
+    Myyrmaki = 16365,
+    Myllypuro = 35449,
+    VanhaViertotie = 16448;
+let stopArray = [];
 
 //DATE&TIME
 const clock = document.createElement('div');
 clock.id = 'clock';
-//body.appendChild(clock);
-//showtime();
+body.appendChild(clock);
+showtime();
 
 function showtime() {
   let date = new Date(),
   yyyy = date.getFullYear(),
-  mm = date.getMonth(),
+  mm = date.getMonth()+1,
   dd = date.getDate(),
   hh = date.getHours(),
   min = date.getMinutes();
@@ -27,46 +34,217 @@ function showtime() {
 
   date = dd + "." + mm + ". " + yyyy + " - " + hh + ":" + min;
   clock.innerHTML = date;
-  setTimeout(showTime, 1000)
+}
+window.onload = function setup() {
+  weather();
+  buses();
+  sodexo(Myyrmaki);
+  setInterval(showtime, 60000);
+  setInterval(weather, 60000);
+  //setInterval(buses, 60000);
+};
+
+
+
+function buses() {
+  fetch('content.json')
+  .then(function(response) {
+    if(response.ok) {
+      //console.log('hsl content.json response ok');
+      return response.json();
+    } else {
+      throw new Error('Response not ok.');
+    }
+  })
+  .then(function(myJson) {
+    myJson.APIs.forEach(function(e) {
+      if (e.name === "hsl") {
+        hslAPI(e.link);
+      }
+    });
+  })
+  .catch(function(e) {
+    console.log(`Error: ${e.message}`);
+  });
 }
 
-fetch('content.json')
-.then(function(response) {
-  if(response.ok) {
-    console.log('response ok');
-    return response.json();
-  } else {
-    throw new Error('Response not ok.');
-  }
-})
-.then(function(myJson) {
-  console.log(`Tuloksia ${myJson.APIs.length} kappaletta.`);
-  myJson.APIs.forEach(function(e) {
-    console.log(e.name, e.link);
-    if (e.name === "announcement") {
-      let announcement = e.link;
+function hslAPI(link) {
+  fetch(campus + '.graphql')
+  .then(function(response) {
+    if(response.ok) {
+      //console.log('HSL API query response ok');
+      return response.text();
+    } else {
+      throw new Error('Response not ok.');
     }
-    else if (e.name === "food") {
-      let food = e.link;
-    }
-    else if (e.name === "hsl") {
-      let bus = e.link;
-    }
-    else if (e.name === "weather") {
-      let weather = e.link;
-      weatherAPI(weather);
-    }
+  })
+  .then(function(textponse) {
+    fetch(link, {method: "POST", // *GET, POST, PUT, DELETE, etc.
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      headers: {
+        "Content-Type": "application/graphql",
+        // "Content-Type": "application/x-www-form-urlencoded",
+      },
+      redirect: "follow", // manual, *follow, error
+      referrer: "no-referrer", // no-referrer, *client
+      body: textponse // body data type must match "Content-Type" header
+    })
+    .then(function(response) {
+      if(response.ok) {
+        //console.log('HSL response ok');
+        return response.json();
+      } else {
+        throw new Error('Response not ok.');
+      }
+    })
+    .then(function(myJson) {
+      //console.log(myJson);
+      stopArray = [];
+      let results = myJson.data.stopsByRadius.edges;
+      results.forEach(a => {
+        stopArray.push(a.node.stop.gtfsId);
+        //fetchTimetable(a, link);
+      });
+      fetchTimetable(stopArray);
+
+    })
+    .catch(function(e) {
+      console.log(`Error: ${e.message}`);
+    });
+  })
+  .catch(function(e) {
+    console.log(`Error: ${e.message}`);
   });
-})
-.catch(function(e) {
-  console.log(`Error: ${e.message}`);
-});
+}
+
+function fetchTimetable(array) {
+  timetable.innerHTML = '';
+  let busesByTime = [],
+  promises = [];
+ array.forEach(a => {
+   let query = "{\n" +
+       "  stop(id: \"" + a + "\") {\n" +
+       "    name\n" +
+       "      stoptimesWithoutPatterns {\n" +
+       "      scheduledArrival\n" +
+       "      realtimeArrival\n" +
+       "      realtime\n" +
+       "      serviceDay\n" +
+       "      headsign\n" +
+       "         trip {routeShortName}" +
+       "    }\n" +
+       "  }  \n" +
+       "}";
+   promises.push(
+     fetch('https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql', {
+       method: "POST", // *GET, POST, PUT, DELETE, etc.
+       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+       headers: {
+         "Content-Type": "application/graphql",
+         // "Content-Type": "application/x-www-form-urlencoded",
+       },
+       redirect: "follow", // manual, *follow, error
+       referrer: "no-referrer", // no-referrer, *client
+       body: query // body data type must match "Content-Type" header
+     }).then(function(response) {
+       if (response.ok) {
+         //console.log('long AF fetch tail is ok');
+         return response.json();
+       } else {
+         throw new Error('Response not ok.');
+       }
+     }).then(function(myJson) {
+       //console.log(myJson);
+       let name = myJson.data.stop.name,
+           data = document.createElement('div');
+       data.innerText = name;
+       //timetable.appendChild(data);
+       let buses = myJson.data.stop.stoptimesWithoutPatterns;
+       buses.forEach(a => {
+         busesByTime.push(a);
+       });
+     }).catch(function(e) {
+       console.log(`Error: ${e.message}`);
+     })
+   )
+ });
+ //console.log(promises);
+  Promise.all(promises).then(() => {
+    //console.log(busesByTime);
+    function normaltime(seconds) {
+      let h = Math.floor(seconds/3600),
+          m = Math.floor(seconds%3600 / 60);
+      h = (h < 10) ? "0" + h : h;
+      m = (m < 10) ? "0" + m : m;
+      return h + ':' + m;
+    }
+
+    let col1 = document.createElement('div'),
+        col2 = document.createElement('div');
+    col1.className = 'col';
+    col2.className = 'col';
+    timetable.appendChild(col1);
+    timetable.appendChild(col2);
+    for (let i = 0; i < 16; i++) {
+      let a = busesByTime[i];
+      let bus = document.createElement('p'),
+          time = document.createElement('p'),
+          header = document.createElement('p'),
+          num = a.trip.routeShortName,
+          head = a.headsign,
+          arrive = normaltime(a.realtimeArrival);
+      if (!a.realtime) {
+        arrive = '~' + normaltime(a.scheduledArrival);
+      }
+      if (head === null) {
+        head = "";
+      }
+      bus.innerHTML = num;
+      time.innerHTML = arrive;
+      header.innerHTML = head;
+      if (i > 7) {
+        col2.appendChild(time);
+        col2.appendChild(bus);
+        col2.appendChild(header);
+      } else {
+        col1.appendChild(time);
+        col1.appendChild(bus);
+        col1.appendChild(header);
+      }
+    }
+  })
+
+
+
+}
+
+function weather() {
+  fetch('content.json')
+  .then(function(response) {
+    if(response.ok) {
+      //console.log('weather url response ok');
+      return response.json();
+    } else {
+      throw new Error('Response not ok.');
+    }
+  })
+  .then(function(myJson) {
+    myJson.APIs.forEach(function(e) {
+      if (e.name === "weather") {
+        weatherAPI(e.link);
+      }
+    });
+  })
+  .catch(function(e) {
+    console.log(`Error: ${e.message}`);
+  });
+}
 
 function weatherAPI(link) {
   fetch(link)
   .then(function(response) {
     if(response.ok) {
-      console.log('response ok');
+      //console.log('weatherAPI response ok');
       return response.json();
     } else {
       throw new Error('Response not ok.');
@@ -82,7 +260,8 @@ function weatherAPI(link) {
         sunrise = myJson.sys.sunrise,
         sunset = myJson.sys.sunset,
         city = myJson.name;
-
+    //test();
+    saa.innerHTML = "";
     //MAIN, TEMP, CITY
     //HEADER PART
     let weatherheader = document.createElement('div');
@@ -183,25 +362,92 @@ function weatherAPI(link) {
     sunsetcont.appendChild(sunsettime);
 
 
-    //UNIX TIME TO HUMAN TIME
-    function timestamp(unix) { //BORROWED FROM STACKOVERFLOW
-      // Create a new JavaScript Date object based on the timestamp
-// multiplied by 1000 so that the argument is in milliseconds, not seconds.
-      let date = new Date(unix*1000);
-// Hours part from the timestamp
-      let hours = date.getHours();
-// Minutes part from the timestamp
-      let minutes = "0" + date.getMinutes();
-// Seconds part from the timestamp
-      let seconds = "0" + date.getSeconds();
-// Will display time in 10:30:23 format
-      let formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-      return formattedTime;
-    }
+
   })
   .catch(function(e) {
     console.log(`Error: ${e.message}`);
   });
-
 }
 
+//UNIX TIME TO HUMAN TIME
+function timestamp(unix) { //BORROWED FROM STACKOVERFLOW
+  // Create a new JavaScript Date object based on the timestamp
+// multiplied by 1000 so that the argument is in milliseconds, not seconds.
+  let date = new Date(unix*1000);
+// Hours part from the timestamp
+  let hours = date.getHours();
+// Minutes part from the timestamp
+  let minutes = "0" + date.getMinutes();
+// Seconds part from the timestamp
+  let seconds = "0" + date.getSeconds();
+// Will display time in 10:30:23 format
+  let formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+  return formattedTime;
+}
+
+function sodexo(campuscode) {
+  fetch('content.json')
+  .then(function(response) {
+    if(response.ok) {
+      //console.log('hsl content.json response ok');
+      return response.json();
+    } else {
+      throw new Error('Response not ok.');
+    }
+  })
+  .then(function(myJson) {
+    myJson.APIs.forEach(function(e) {
+      if (e.name === "food") {
+        let day = new Date(),
+            year = day.getFullYear(),
+            month = day.getMonth(),
+            dayn = day.getDay();
+        month = (month < 10) ? "0" + month : month;
+        dayn = (dayn < 10) ? "0" + dayn : dayn;
+        let addedData = campuscode + '/' + year + '/' + month + '/' + dayn + '/fi',
+            fullURL = e.link + addedData;
+        console.log(fullURL);
+        //CALL NEXT FUNCTION
+        menu(fullURL);
+      }
+    });
+  })
+  .catch(function(e) {
+    console.log(`Error: ${e.message}`);
+  });
+}
+
+function menu(url) {
+  fetch("https://cors-anywhere.herokuapp.com/" + url, {
+    method: "GET", // *GET, POST, PUT, DELETE, etc.
+    mode: "cors", // no-cors, cors, *same-origin
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    //credentials: "same-origin", // include, *same-origin, omit
+    headers: {
+      "Content-Type": "application/json",
+      // "Content-Type": "application/x-www-form-urlencoded",
+    },
+    redirect: "follow", // manual, *follow, error
+    referrer: "no-referrer", // no-referrer, *client
+    //body: JSON.stringify(data), // body data type must match "Content-Type" header
+  })
+  .then(function(response) {
+    if(response.ok) {
+      //console.log('hsl content.json response ok');
+      return response.json();
+    } else {
+      console.log(response);
+      throw new Error('Response not ok.');
+    }
+  })
+  .then(function(myJson) {
+    console.log(myJson);
+  })
+  .catch(function(e) {
+    console.log(`Error: ${e.message}`);
+  });
+}
+
+function test() {
+  console.log('test');
+}

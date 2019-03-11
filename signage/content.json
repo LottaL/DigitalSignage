@@ -3,9 +3,9 @@
     {"name": "announcement",
       "link": ""},
     {"name": "food",
-      "link":"https://www.sodexo.fi/ruokalistat/output/daily_json/16365/2019/03/05/fi"},
+      "link":"https://www.sodexo.fi/ruokalistat/output/daily_json/"},
     {"name": "hsl",
-      "link": ""},
+      "link": "https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql"},
     {"name": "weather",
       "link": "http://api.openweathermap.org/data/2.5/weather?q=Helsinki&APPID=b7f533218876c379d7fbca43c5ef92f7"}
   ]

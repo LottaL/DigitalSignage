@@ -1,0 +1,28 @@
+{
+	nearest(lat: 60.2585857, lon: 24.8433926, maxDistance: 500, filterByPlaceTypes: DEPARTURE_ROW, maxResults: 16) {
+    edges {
+      node {
+        place {
+          ...on DepartureRow {
+            stop {
+              name
+            }
+            stoptimes {
+              serviceDay
+              scheduledDeparture
+              realtimeDeparture
+              trip {
+                route {
+                  shortName
+                  longName
+                }
+              }
+              headsign
+            }
+          }
+        }
+      	distance
+      }
+    }
+  }
+}
