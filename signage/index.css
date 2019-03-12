@@ -49,27 +49,26 @@ html, body {
 }
 
 .grid_container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 95%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 98%;
     margin: auto;
     margin-top: 14vh;
-
-    grid-column-gap: 4vh;
-    grid-row-gap: 4vh;
 }
 
 .box {
-    width: auto;
+    width: 47vw;
     height: 40vh;
     border: solid #666f6f 4px;
     z-index: 4;
+    margin-bottom: 3vh;
 }
 
 #saa {
     background-color: white;
     opacity: 0.7;
-
+    width: 30vw;
 }
 
 .datadiv {
@@ -127,6 +126,7 @@ html, body {
 #hsl {
     background-color: rgba(0, 92, 153, 0.9);
     color: white;
+    width: 64vw;
 }
 
 #hslheader {
@@ -158,11 +158,22 @@ html, body {
 #timetable p {
     margin: 0;
     margin-top: 1vh;
-    font-size: 1.8vh;
 }
 
 .col {
     display: grid;
-    grid-template-columns: 21% 12% 68%;
-    grid-template-rows: repeat(12%);
+    grid-template-columns: 13% 62% 21%;
+    grid-template-rows: repeat(6, 20%);
+}
+
+.col p {
+    font-size: 1.8vh;
+}
+
+.sec {
+    grid-template-rows: repeat(12, 8%);
+}
+
+.sec p {
+    font-size: 1vh;
 }
