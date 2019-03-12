@@ -131,6 +131,7 @@ html, body {
 
 #hslheader {
     display: flex;
+    height: 19%;
 }
 
 #hsl h2 {
@@ -153,6 +154,8 @@ html, body {
 #timetable {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    height: 80%;
+    color: yellow;
 }
 
 #timetable p {
@@ -162,18 +165,20 @@ html, body {
 
 .col {
     display: grid;
-    grid-template-columns: 13% 62% 21%;
-    grid-template-rows: repeat(6, 20%);
+    grid-template-columns: 9% 45% 27% 16%;
+    grid-template-rows: repeat(6, 15%);
+    margin-left: 2vh;
 }
 
 .col p {
     font-size: 1.8vh;
 }
 
-.sec {
-    grid-template-rows: repeat(12, 8%);
+.col:first-child {
+    border-right: solid yellow 0.3vh;
 }
 
-.sec p {
-    font-size: 1vh;
+p.title {
+    border-bottom: solid yellow 0.2vh;
+    margin-top: 0;
 }
