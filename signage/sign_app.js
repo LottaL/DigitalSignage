@@ -17,7 +17,6 @@ let stopArray = [];
 const clock = document.createElement('div');
 clock.id = 'clock';
 body.appendChild(clock);
-showtime();
 
 function showtime() {
   let date = new Date(),
@@ -32,16 +31,18 @@ function showtime() {
   hh = (hh < 10) ? "0" + hh : hh;
   min = (min < 10) ? "0" + min : min;
 
-  date = dd + "." + mm + ". " + yyyy + " - " + hh + ":" + min;
+  date = dd + "." + mm + "." + yyyy + " - " + hh + ":" + min;
   clock.innerHTML = date;
 }
 window.onload = function setup() {
+  showtime();
   weather();
   buses();
   sodexo(Myyrmaki);
+  setInterval(sodexo(Myyrmaki), 3600000);
   setInterval(showtime, 60000);
-  setInterval(weather, 60000);
-  //setInterval(buses, 60000);
+  setInterval(weather, 3600000);
+  setInterval(buses, 60000);
 };
 
 
@@ -161,6 +162,8 @@ function fetchTimetable(array) {
        //timetable.appendChild(data);
        let buses = myJson.data.stop.stoptimesWithoutPatterns;
        buses.forEach(a => {
+         a.stopname = name;
+         //console.log(a.stopname);
          busesByTime.push(a);
        });
      }).catch(function(e) {
@@ -171,6 +174,12 @@ function fetchTimetable(array) {
  //console.log(promises);
   Promise.all(promises).then(() => {
     //console.log(busesByTime);
+
+    busesByTime.sort(function(a, b) {
+      return a.serviceDay - b.serviceDay || a.realtimeArrival - b.realtimeArrival;
+    });
+    console.log(busesByTime);
+
     function normaltime(seconds) {
       let h = Math.floor(seconds/3600),
           m = Math.floor(seconds%3600 / 60);
@@ -180,36 +189,78 @@ function fetchTimetable(array) {
     }
 
     let col1 = document.createElement('div'),
-        col2 = document.createElement('div');
+        col2 = document.createElement('div'),
+        bus = document.createElement('p'),
+        time = document.createElement('p'),
+        header = document.createElement('p'),
+        stop = document.createElement('p');
+    bus.innerHTML = "linja";
+    time.innerHTML = "lähtöaika";
+    header.innerHTML = "reitti";
+    stop.innerHTML = "pysäkki";
+
     col1.className = 'col';
     col2.className = 'col';
     timetable.appendChild(col1);
+    nameThem(col1);
     timetable.appendChild(col2);
-    for (let i = 0; i < 16; i++) {
+    nameThem(col2);
+
+    function nameThem(div) {
+      let columns = ["linja", "reitti", "pysäkki", "lähtöaika"];
+      columns.forEach(a => {
+        let p = document.createElement('p');
+        p.innerHTML = a;
+        p.className = "title";
+        div.appendChild(p);
+      })
+    }
+
+    for (let i = 0; i < 12; i++) {
       let a = busesByTime[i];
       let bus = document.createElement('p'),
           time = document.createElement('p'),
           header = document.createElement('p'),
+          stop = document.createElement('p'),
           num = a.trip.routeShortName,
           head = a.headsign,
-          arrive = normaltime(a.realtimeArrival);
-      if (!a.realtime) {
+          arrive = normaltime(a.realtimeArrival),
+          stopname = a.stopname;
+      bus.style.fontWeight = "bold";
+      header.style.fontSize = "1.6vh";
+      let midnight = a.serviceDay,
+          leavetime = a.realtimeArrival,
+          now = Math.floor(Date.now()/1000);
+      let minsTilDep = Math.floor(Math.abs((now-(midnight+leavetime))/60));
+      if (minsTilDep <= 10) {
+        arrive = minsTilDep;
+        if (!a.realtime) {
+          arrive = '~' + minsTilDep;
+        }
+      } else if (!a.realtime) {
         arrive = '~' + normaltime(a.scheduledArrival);
       }
+
       if (head === null) {
-        head = "";
+        head = "[reitti ei saatavilla]";
+      }
+      if (stopname.length >= 10) {
+        stopname = stopname.substring(0, 9);
       }
       bus.innerHTML = num;
       time.innerHTML = arrive;
       header.innerHTML = head;
-      if (i > 7) {
-        col2.appendChild(time);
+      stop.innerHTML = stopname;
+      if (i > 5) {
         col2.appendChild(bus);
         col2.appendChild(header);
+        col2.appendChild(stop);
+        col2.appendChild(time);
       } else {
-        col1.appendChild(time);
         col1.appendChild(bus);
         col1.appendChild(header);
+        col1.appendChild(stop);
+        col1.appendChild(time);
       }
     }
   })
