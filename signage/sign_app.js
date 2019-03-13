@@ -1,4 +1,7 @@
 'use strict';
+//in a very hypothetic situation, we would have a JSON file or even a database to store both, the API
+//links and keys needed and campus data to run following script on a certain campus: GPS coordinates,
+//Sodexo campus codes etc.
 
 const body = document.querySelector('body'),
     tiedote = document.querySelector('#tiedote'),
@@ -6,6 +9,7 @@ const body = document.querySelector('body'),
     hsl = document.querySelector('#hsl'),
     saa = document.querySelector('#saa'),
     timetable = document.querySelector('#timetable');
+
 let campus = 'leiritiestop',
     Arabia = 16364,
     Myyrmaki = 16365,
@@ -38,14 +42,14 @@ window.onload = function setup() {
   showtime();
   weather();
   buses();
+  announcements();
   sodexo(Myyrmaki);
   function getfood() {sodexo(Myyrmaki)}
-  setInterval(getfood, 60000);
-  setInterval(showtime, 60000);
-  setInterval(weather, 3600000);
-  setInterval(buses, 60000);
-  announcements();
-
+  setInterval(getfood, 10800000);// = 3h
+  setInterval(showtime, 60000);// = 1min
+  setInterval(weather, 3600000);// = 1h
+  setInterval(buses, 60000);// = 1min
+  setInterval(announcements, 3600000);// = 1h
 };
 /*
 function selectCampus(){
@@ -60,7 +64,6 @@ function buses() {
   fetch('content.json')
       .then(function(response) {
         if(response.ok) {
-          //console.log('hsl content.json response ok');
           return response.json();
         } else {
           throw new Error('Response not ok.');
@@ -82,7 +85,6 @@ function hslAPI(link) {
   fetch(campus + '.graphql')
       .then(function(response) {
         if(response.ok) {
-          //console.log('HSL API query response ok');
           return response.text();
         } else {
           throw new Error('Response not ok.');
@@ -101,19 +103,16 @@ function hslAPI(link) {
         })
             .then(function(response) {
               if(response.ok) {
-                //console.log('HSL response ok');
                 return response.json();
               } else {
                 throw new Error('Response not ok.');
               }
             })
             .then(function(myJson) {
-              //console.log(myJson);
               stopArray = [];
               let results = myJson.data.stopsByRadius.edges;
               results.forEach(a => {
                 stopArray.push(a.node.stop.gtfsId);
-                //fetchTimetable(a, link);
               });
               fetchTimetable(stopArray);
 
@@ -158,21 +157,17 @@ function fetchTimetable(array) {
           body: query // body data type must match "Content-Type" header
         }).then(function(response) {
           if (response.ok) {
-            //console.log('long AF fetch tail is ok');
             return response.json();
           } else {
             throw new Error('Response not ok.');
           }
         }).then(function(myJson) {
-          //console.log(myJson);
           let name = myJson.data.stop.name,
               data = document.createElement('div');
           data.innerText = name;
-          //timetable.appendChild(data);
           let buses = myJson.data.stop.stoptimesWithoutPatterns;
           buses.forEach(a => {
             a.stopname = name;
-            //console.log(a.stopname);
             busesByTime.push(a);
           });
         }).catch(function(e) {
@@ -180,14 +175,10 @@ function fetchTimetable(array) {
         })
     )
   });
-  //console.log(promises);
   Promise.all(promises).then(() => {
-    //console.log(busesByTime);
-
     busesByTime.sort(function(a, b) {
       return a.serviceDay - b.serviceDay || a.realtimeArrival - b.realtimeArrival;
     });
-    console.log(busesByTime);
 
     function normaltime(seconds) {
       let h = Math.floor(seconds/3600),
@@ -282,7 +273,6 @@ function weather() {
   fetch('content.json')
       .then(function(response) {
         if(response.ok) {
-          //console.log('weather url response ok');
           return response.json();
         } else {
           throw new Error('Response not ok.');
@@ -304,7 +294,6 @@ function weatherAPI(link) {
   fetch(link)
       .then(function(response) {
         if(response.ok) {
-          //console.log('weatherAPI response ok');
           return response.json();
         } else {
           throw new Error('Response not ok.');
@@ -449,7 +438,6 @@ function sodexo(campuscode) {
   fetch('content.json')
       .then(function(response) {
         if(response.ok) {
-          //console.log('hsl content.json response ok');
           return response.json();
         } else {
           throw new Error('Response not ok.');
@@ -466,7 +454,6 @@ function sodexo(campuscode) {
             dayn = (dayn < 10) ? "0" + dayn : dayn;
             let addedData = campuscode + '/' + year + '/' + month + '/' + dayn + '/fi',
                 fullURL = e.link + addedData;
-            console.log(fullURL);
             //CALL NEXT FUNCTION
             menu(fullURL);
           }
@@ -635,6 +622,7 @@ function announcementAPI(link) {
             let date = document.createElement('h4');
             date.innerHTML = pubDate;
             tiedote.appendChild(date);
+
         })
         .catch(function (e) {
             console.log(`Error: ${e.message}`);

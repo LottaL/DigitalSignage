@@ -3,6 +3,12 @@ html, body {
     padding: 0;
     font-family: Verdana, Geneva, sans-serif;
     color: #5f5f5f;
+
+    background: url(img/helsinki.jpg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
 }
 
 * {
