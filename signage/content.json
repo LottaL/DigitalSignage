@@ -1,7 +1,7 @@
 {
   "APIs":[
     {"name": "announcement",
-      "link": ""},
+      "link": "https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.hs.fi%2Frss%2Ftuoreimmat.xml"},
     {"name": "food",
       "link":"https://www.sodexo.fi/ruokalistat/output/daily_json/"},
     {"name": "hsl",

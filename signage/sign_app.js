@@ -44,6 +44,7 @@ window.onload = function setup() {
   setInterval(showtime, 60000);
   setInterval(weather, 3600000);
   setInterval(buses, 60000);
+  announcements();
 
 };
 /*
@@ -576,4 +577,66 @@ function menu(url) {
 
 function test() {
   console.log('test');
+}
+
+//ANNOUNCEMENT
+function announcements() {
+    fetch('content.json')
+        .then(function(response) {
+            if(response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Response not ok.');
+            }
+        })
+        .then(function(myJson) {
+            myJson.APIs.forEach(function(e) {
+                if (e.name === "announcement") {
+                    announcementAPI(e.link);
+                }
+            });
+        })
+        .catch(function(e) {
+            console.log(`Error: ${e.message}`);
+        });
+}
+
+function announcementAPI(link) {
+    fetch(link)
+        .then(function (response) {
+            if (response.ok) {
+                console.log('response ok');
+                return response.json();
+            } else {
+                throw new Error('Response not ok.');
+            }
+        })
+        .then(function (myJson) {
+            /*let main = myJson.feed.title;
+
+            let maintitle = document.createElement('h2');
+            maintitle.innerHTML = main;
+            tiedote.appendChild(maintitle);*/
+
+            let news = myJson.items[1,2,3].title;
+
+            let newsheader = document.createElement('h3');
+            newsheader.innerHTML = news;
+            tiedote.appendChild(newsheader);
+
+            let url = myJson.items[1,2,3].link;
+
+            let newslink = document.createElement('h5');
+            newslink.innerHTML = url;
+            tiedote.appendChild(newslink);
+
+            let pubDate = myJson.items[1,2,3].pubDate;
+
+            let date = document.createElement('h4');
+            date.innerHTML = pubDate;
+            tiedote.appendChild(date);
+        })
+        .catch(function (e) {
+            console.log(`Error: ${e.message}`);
+        });
 }

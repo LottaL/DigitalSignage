@@ -220,3 +220,18 @@ p.title {
     border-bottom: solid yellow 0.2vh;
     margin-top: 0;
 }
+
+#tiedote {
+    background-color: white;
+    opacity: 0.9;
+    color: black;
+    padding: 1rem;
+}
+
+#tiedote h5 {
+    color: #2e8dfc;
+}
+
+#tiedote h3 {
+    text-decoration: underline;
+}
