@@ -233,9 +233,9 @@ function fetchTimetable(array) {
           now = Math.floor(Date.now()/1000);
       let minsTilDep = Math.floor(Math.abs((now-(midnight+leavetime))/60));
       if (minsTilDep <= 10) {
-        arrive = minsTilDep;
+        arrive = minsTilDep + ' min';
         if (!a.realtime) {
-          arrive = '~' + minsTilDep;
+          arrive = '~' + minsTilDep + ' min';
         }
       } else if (!a.realtime) {
         arrive = '~' + normaltime(a.scheduledArrival);
@@ -452,7 +452,7 @@ function sodexo(campuscode) {
         let day = new Date(),
             year = day.getFullYear(),
             month = day.getMonth(),
-            dayn = day.getDay();
+            dayn = day.getDate();
         month = (month < 10) ? "0" + month : month;
         dayn = (dayn < 10) ? "0" + dayn : dayn;
         let addedData = campuscode + '/' + year + '/' + month + '/' + dayn + '/fi',
