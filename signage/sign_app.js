@@ -448,7 +448,7 @@ function sodexo(campuscode) {
           if (e.name === "food") {
             let day = new Date(),
                 year = day.getFullYear(),
-                month = day.getMonth(),
+                month = day.getMonth()+1,
                 dayn = day.getDate();
             month = (month < 10) ? "0" + month : month;
             dayn = (dayn < 10) ? "0" + dayn : dayn;
