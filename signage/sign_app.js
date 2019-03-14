@@ -245,7 +245,7 @@ function fetchTimetable(array) {
         head = "[reitti ei saatavilla]";
       }
       if (stopname.length >= 10) {
-        stopname = stopname.substring(0, 9);
+        stopname = stopname.substring(0, 8) + '...';
       }
       bus.innerHTML = num;
       time.innerHTML = arrive;
